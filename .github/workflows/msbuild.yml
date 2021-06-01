@@ -1,0 +1,28 @@
+on:
+  push:
+    tags:
+    - 'v*' # Push events to matching v*, i.e. v1.0
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup MSBuild Path
+      uses: microsoft/Setup-MSBuild@v1.0.2
+
+    - name: Run MSBuild
+      working-directory: .\src\PortBender
+      run: msbuild PortBender.sln /property:Configuration=Release /property:Platform=x86
+
+    - name: Build PortBender Zip Package
+      run: '7z.exe a -tzip PortBender.zip .\src\portbender\release\portbender.dll .\static\PortBender.cna .\static\WinDivert32.sys .\static\WinDivert64.sys'
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          PortBender.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
