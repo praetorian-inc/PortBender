@@ -10,12 +10,20 @@ alias PortBender {
     local('$bid' '$args');
     $bid = $1;
     $args = substr($0, 11);
+    $action = split(" ", $args);
 
     if ($args eq "") {
 		berror($bid, "Please specify an argument string");
 		return;
-	}
+    } 
+    else if ("redirect" eq $action[0] || "backdoor" eq $action[0]) {
+		blog($bid, "Launching PortBender module using reflective DLL injection\n");
+		bdllspawn($bid, script_resource("PortBender.dll"), $args, "PortBender", 5000, false);
+		return;
+    }
+    else {
+		berror($bid, "The arguments do not contain an action of either \"redirect\" or \"backdoor\".");
+		return;
+    }
 
-    blog($bid, "Launching PortBender module using reflective DLL injection\n");
-    bdllspawn($bid, script_resource("PortBender.dll"), $args, "PortBender", 5000, false);
 }
